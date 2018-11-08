@@ -1,4 +1,7 @@
 const sha1 = require('sha1');
+const getRawBody = require('raw-body');
+const util = require('./until');
+
 // 配置验证微信的过程
 module.exports = (config) => {
     return async (ctx, next) => {
@@ -25,6 +28,44 @@ module.exports = (config) => {
             if (sha !== signature) {
                 return ctx.body = 'Failed';
             }
+            
+            const data = await getRawBody(ctx.req,{
+                length: ctx.length,
+                limit:'1mb',
+                encoding: ctx.charset
+            });
+            
+            const content = await util.parseXML(data);
+            console.log('content');
+            console.log(content);
+            const message =  util.formatMessage(content.xml);
+
+            ctx.status = 200;
+            ctx.type = 'application/xml';
+
+            console.log('message');
+            console.log(message);
+            
+            //这里微信文档有坑 xml数据要没有空格
+            ctx.body = `
+                <xml>
+                    <ToUserName>
+                        <![CDATA[${message.FromUserName}]]>
+                    </ToUserName>
+                    <FromUserName>
+                        <![CDATA[${message.ToUserName}]]>
+                    </FromUserName>
+                    <CreateTime>${parseInt(new Date().getTime()/1000,0)}</CreateTime>
+                    <MsgType>
+                        <![CDATA[text]]>
+                    </MsgType>
+                    <Content>
+                        <![CDATA[${message.Content}]]>
+                    </Content>
+                    <MsgId>1234567890123456</MsgId>
+                </xml>`;
+            
         }
     }
 }
+
