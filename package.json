@@ -19,7 +19,9 @@
   "homepage": "https://github.com/vajsp/wechat7-koa2#readme",
   "dependencies": {
     "ejs": "^2.6.1",
+    "glob": "^7.1.3",
     "koa": "^2.5.3",
+    "mongoose": "^5.3.11",
     "raw-body": "^2.3.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",

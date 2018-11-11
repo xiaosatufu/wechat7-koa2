@@ -8,10 +8,12 @@ const api = {
 
 module.exports = class Wechat{
     constructor(opts){
-        
         this.opts = Object.assign({},opts);
         this.appID = opts.appID;
         this.appSecret = opts.appSecret;
+        this.getAccessToken = opts.getAccessToken;
+        this.saveAccessToken = opts.saveAccessToken;
+        
 
         this.fetchAccessToken();
     }
@@ -28,18 +30,27 @@ module.exports = class Wechat{
         }
     }
 
-    async fetchAccessToken(){
-        let data
 
-        if (this.getAccessToken) {
-            data = await this.getAccessToken();
-        }
+    // 1.首先检查数据库里的token是否过期
+    // 2.过期则刷新
+    // 3.token入库
+    async fetchAccessToken(){
+        let data = await this.getAccessToken();
+
+        // if (this.getAccessToken) {
+        //     data = await this.getAccessToken();
+        // }
 
         if (!this.isValidToken(data)) {
             data = await this.updateAccessToken();
         }
+
+        await this.saveAccessToken(data);
+
+        return data
     }
 
+    // 获取token
     async updateAccessToken(){
         const url = `${api.accessToken}&appid=${this.appID}&secret=${this.appSecret}`;
 
@@ -49,7 +60,7 @@ module.exports = class Wechat{
 
         data.expires_in = expiresIn;
         
-        console.log('data');
+        console.log('获取token');
         console.log(data);
 
         
