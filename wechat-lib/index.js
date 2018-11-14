@@ -7,6 +7,11 @@ const api = {
     accessToken: base + 'token?grant_type=client_credential',
     temporary: {
         upload: base + 'media/upload?'
+    },
+    permanent:{
+        upload: base + 'material/add_material?',
+        uploadNews: base + 'material/add_news?',
+        uploadNewsPic: base + 'media/uploadimg?'
     }
 }
 
@@ -89,25 +94,58 @@ module.exports = class Wechat {
     uploadMaterial(token, type, material, permanent = false) {
         let form = {};
         let url = api.temporary.upload
-
+        
+        // 永久素材 form是个obj,继承外面传入的新对象
         if (permanent) {
-            // url = api.p
+            url = api.permanent.upload;
+            form = Object.assign(form,permanent);
         }
+
+        // 上传图文消息的图片素材
+        if (type === 'pic') {
+            url = api.permanent.uploadNewsPic;
+        }
+
+        // 图文非图文的素材提交表单的切换
+        if (type === 'news') {
+            url = api.permanent.uploadNews;
+            form = material;
+        }else{
+            form.media = fs.createReadStream(material);
+        }
+
+
 
         console.log('material');
         console.log(material);
 
         // material是个文件路径
-        form.media = fs.createReadStream(material);
+        // form.media = fs.createReadStream(material);
         // form.media = fs.readFileSync(material);
 
-        let uploadUrl = `${url}access_token=${token}&type=${type}`
+        let uploadUrl = `${url}access_token=${token}`
+        
+        // 根据素材永久性填充token
+        if (!permanent) {
+            uploadUrl += `&type=${type}`
+        }else{
+            if(type !== 'news'){
+                form.access_token = token;
+            }
+        }
 
         const options = {
             methods: 'POST',
             url: uploadUrl,
             json: true,
-            formData: form
+            // formData: form
+        }
+
+        // 图文和非图文在request 提交主体判断
+        if (type === 'news') {
+            options.body = form;
+        }else{
+            options.formData = form;
         }
 
         // console.log('options.formData');
