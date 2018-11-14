@@ -9,8 +9,9 @@ module.exports = (config, reply) => {
         // timestamp	时间戳
         // nonce	随机数
         // echostr	随机字符串
-        console.log('ctx.query');
-        console.log(ctx.query);
+        
+        // console.log('ctx.query');
+        // console.log(ctx.query);
 
         const { signature, timestamp, nonce, echostr } = ctx.query;
         const token = config.wechat.token;
@@ -38,8 +39,8 @@ module.exports = (config, reply) => {
             const content = await util.parseXML(data);
             const message = util.formatMessage(content.xml);
             
-            console.log('message');
-            console.log(message);
+            // console.log('message');
+            // console.log(message);
             
             ctx.weixin = message;
             

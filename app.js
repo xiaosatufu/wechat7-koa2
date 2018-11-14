@@ -13,8 +13,8 @@ const { initSchemas, connect } = require('./app/database/init');
     initSchemas();
     
     // 测试token的数据库存贮
-    const { test } = require('./wechat/index');
-    await test();
+    // const { test } = require('./wechat/index');
+    // await test();
     
     
     // 生成服务器实例

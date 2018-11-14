@@ -32,6 +32,10 @@ exports.test = async () => {
 }
 
 
+exports.getWechat = () => {
+    return new Wechat(wechatCfg.wechat);
+}
+
 // ;(async () => {
 //     // 获取token
 //     const client = new Wechat(wechatCfg.wechat);

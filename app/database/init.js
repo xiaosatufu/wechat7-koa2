@@ -12,12 +12,32 @@ exports.initSchemas = () => {
 
 exports.connect = (db) => {
     return new Promise((resolve, reject) => {
+        let maxConnectTimes = 0;
+
+        //  开启数据库调试
+        if(process.env.NODE_ENV !== 'production'){
+            // mongoose.set('debug',true);
+        }
+        
         mongoose.connect(db, { useNewUrlParser: true });
         mongoose.connection.on('disconnect', () => {
-            console.log('数据库挂了吧少年');
+            maxConnectTimes++;
+
+            if(maxConnectTimes < 5){
+                mongoose.connect(db);
+            } else{
+                throw new Error('数据库挂了吧少年');
+            }
+            
         })
         mongoose.connection.on('error', (err) => {
-            console.log(err);
+            maxConnectTimes++;
+
+            if(maxConnectTimes < 5){
+                mongoose.connect(db);
+            } else{
+                throw new Error('数据库报错了少年');
+            }
         })
         mongoose.connection.on('open', () => {
             resolve();
