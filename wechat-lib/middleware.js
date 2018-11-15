@@ -39,9 +39,6 @@ module.exports = (config, reply) => {
             const content = await util.parseXML(data);
             const message = util.formatMessage(content.xml);
             
-            // console.log('message');
-            // console.log(message);
-            
             ctx.weixin = message;
             
             await reply.apply(ctx, [ctx, next]);

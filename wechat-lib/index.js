@@ -8,10 +8,20 @@ const api = {
     temporary: {
         upload: base + 'media/upload?'
     },
-    permanent:{
+    permanent: {
         upload: base + 'material/add_material?',
         uploadNews: base + 'material/add_news?',
-        uploadNewsPic: base + 'media/uploadimg?'
+        uploadNewsPic: base + 'media/uploadimg?',
+        // 获取永久素材
+        fetch: base + 'material/get_material?',
+        // 删除永久素材
+        del: base + 'material/del_material?',
+        // 更新永久素材
+        update: base + 'material/update_material?',
+        // 获取素材总数
+        count: base + 'material/get_materialcount?',
+        // 获取素材列表
+        batch: base + 'material/batchget_material?'
     }
 }
 
@@ -93,12 +103,12 @@ module.exports = class Wechat {
 
     uploadMaterial(token, type, material, permanent = false) {
         let form = {};
-        let url = api.temporary.upload
-        
+        let url = api.temporary.upload;
+
         // 永久素材 form是个obj,继承外面传入的新对象
         if (permanent) {
             url = api.permanent.upload;
-            form = Object.assign(form,permanent);
+            form = Object.assign(form, permanent);
         }
 
         // 上传图文消息的图片素材
@@ -110,32 +120,27 @@ module.exports = class Wechat {
         if (type === 'news') {
             url = api.permanent.uploadNews;
             form = material;
-        }else{
+        } else {
             form.media = fs.createReadStream(material);
         }
-
-
-
-        console.log('material');
-        console.log(material);
 
         // material是个文件路径
         // form.media = fs.createReadStream(material);
         // form.media = fs.readFileSync(material);
 
         let uploadUrl = `${url}access_token=${token}`
-        
+
         // 根据素材永久性填充token
         if (!permanent) {
             uploadUrl += `&type=${type}`
-        }else{
-            if(type !== 'news'){
+        } else {
+            if (type !== 'news') {
                 form.access_token = token;
             }
         }
 
         const options = {
-            methods: 'POST',
+            method: 'POST',
             url: uploadUrl,
             json: true,
             // formData: form
@@ -144,7 +149,7 @@ module.exports = class Wechat {
         // 图文和非图文在request 提交主体判断
         if (type === 'news') {
             options.body = form;
-        }else{
+        } else {
             options.formData = form;
         }
 
@@ -164,5 +169,74 @@ module.exports = class Wechat {
         const data = await this.request(options);
 
         return data;
+    }
+
+    fetchMaterial(token, mediaId, type, permanent) {
+        let form = {};
+        let fetchUrl = api.permanent.fetch;
+        let url = fetchUrl + 'access_token=' + token
+        let options = {
+            method: 'POST',
+            url
+        }
+
+        form.media_id = mediaId;
+        form.access_token = token;
+        options.body = form;
+
+        return options
+    }
+
+    deleteMaterial(token, mediaId) {
+        const form = {
+            media_id: mediaId
+        }
+
+        const url = `${api.permanent.del}access_token=${token}&media_id=${mediaId}`;
+
+        return {
+            method: 'POST',
+            url,
+            body: form
+        }
+    }
+
+    updateMaterial(token, mediaId , news) {
+        let form = {
+            media_id: mediaId
+        }
+
+        form = Object.assign(form,news);
+
+        const url = `${api.permanent.update}access_token=${token}&media_id=${mediaId}`;
+
+        return {
+            method: 'POST',
+            url,
+            body: form
+        }
+    }
+
+    countMaterial(token) {
+        const url = `${api.permanent.count}access_token=${token}`;
+
+        return {
+            method: 'POST',
+            url
+        }
+    }
+
+    batchMaterial(token, options) {
+        options.type = options.type || 'image';
+        options.offset = options.offset || 0;
+        options.count = options.count || 10;
+
+        const url = `${api.permanent.batch}access_token=${token}`;
+
+        return {
+            method: 'POST',
+            url,
+            body: options
+        }
     }
 }

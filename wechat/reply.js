@@ -19,42 +19,35 @@ let reply = async (ctx, next) => {
             reply = '天下第三尺鸭蛋'
         } else if (content === '4') {
             let data = await client.handle('uploadMaterial', 'image', resolve(__dirname, '../img.jpg'));
-            // 临时素材
-            // errmsg: 'media data missing hint node 错误没有解决
-
-            console.log('4的中的data');
-            console.log(data);
-
+            // 临时素材 图片上传
+            
             reply = {
                 type: 'image',
                 mediaId: data.media_id
             }
         } else if (content === '5') {
             let data = await client.handle('uploadMaterial', 'video', resolve(__dirname, '../video.mp4'));
-            // 临时素材
-            // errmsg: 'media data missing hint node 错误没有解决
+            // 临时素材 视频的上传测试
 
             // console.log('5的中的data');
             // console.log(data);
 
             reply = {
                 type: 'video',
-                title: '回复的视频标题',
-                description: '测试啊测试',
+                title: '临时素材视频',
+                description: '测试临时素材视频',
                 mediaId: data.media_id
             }
         } else if (content === '6') {
             let data = await client.handle('uploadMaterial', 'video', resolve(__dirname, '../video.mp4'), {
                 type: 'video',
-                description: '{"title":"这个地方很棒","introduction":"永久测试"}'
+                description: '{"title":"永久素材视频素材测试","introduction":"永久测试"}'
             });
 
-            console.log('6的中的data');
-            console.log(data);
 
             reply = {
                 type: 'video',
-                title: '永久视频测试',
+                title: '永久素材视频测试',
                 description: '测试啊测试',
                 mediaId: data.media_id
             }
@@ -62,11 +55,7 @@ let reply = async (ctx, next) => {
             let data = await client.handle('uploadMaterial', 'image', resolve(__dirname, '../img.jpg'), {
                 type: 'image'
             });
-            // 永久素材
-            // errmsg: 'media data missing hint node 错误没有解决
-
-            console.log('7的中的data');
-            console.log(data);
+            // 永久素材 图片
 
             reply = {
                 type: 'image',
@@ -76,10 +65,6 @@ let reply = async (ctx, next) => {
             // 回复图文
 
             let data = await client.handle('uploadMaterial', 'image', resolve(__dirname, '../img.jpg'), {
-                type: 'image'
-            });
-
-            let data2 = await client.handle('uploadMaterial', 'pic', resolve(__dirname, '../img.jpg'), {
                 type: 'image'
             });
 
@@ -111,6 +96,43 @@ let reply = async (ctx, next) => {
             console.log(uploadData);
             
             reply = '上传成功'
+        } else if (content === '9'){
+            // 查询媒体数量
+            let counts = await client.handle('countMaterial');
+
+            console.log(JSON.stringify(counts));
+
+            let res = await Promise.all([
+                client.handle('batchMaterial',{
+                    type: 'image',
+                    offset: 0,
+                    count: 10
+                }),
+                client.handle('batchMaterial',{
+                    type: 'video',
+                    offset: 0,
+                    count: 10
+                }),
+                client.handle('batchMaterial',{
+                    type: 'voice',
+                    offset: 0,
+                    count: 10
+                }),
+                client.handle('batchMaterial',{
+                    type: 'news',
+                    offset: 0,
+                    count: 10
+                }),
+            ]);
+
+            console.log(res);
+
+            reply = `
+                image: ${res[0].total_count}
+                video: ${res[1].total_count}
+                voice: ${res[2].total_count}
+                news: ${res[3].total_count}
+            `
         }
 
         ctx.body = reply;

@@ -15,8 +15,8 @@ exports.connect = (db) => {
         let maxConnectTimes = 0;
 
         //  开启数据库调试
-        if(process.env.NODE_ENV !== 'production'){
-            // mongoose.set('debug',true);
+        if(process.env.NODE_ENV === 'db'){
+            mongoose.set('debug',true);
         }
         
         mongoose.connect(db, { useNewUrlParser: true });

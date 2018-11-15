@@ -53,6 +53,7 @@ exports.formatMessage = (result) => {
 }
 
 exports.tpl = (content,message) => {
+    
     let type = 'text';
 
     if (Array.isArray(content)) {
@@ -63,7 +64,7 @@ exports.tpl = (content,message) => {
         content = 'Empty News';
     }
 
-    if (!content) {
+    if (content.type) {
         type = content.type;
     }
 
@@ -75,7 +76,7 @@ exports.tpl = (content,message) => {
         fromUserName: message.ToUserName
     })
 
-    return template(info); 
+    return template(info);
 }
 
 

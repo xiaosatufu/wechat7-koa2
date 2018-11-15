@@ -5,7 +5,8 @@
   "main": "check.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./app.js"
+    "start": "cross-env  NODE_ENV=production  nodemon ./app.js",
+    "db": "cross-env  NODE_ENV=db  nodemon ./app.js"
   },
   "repository": {
     "type": "git",
