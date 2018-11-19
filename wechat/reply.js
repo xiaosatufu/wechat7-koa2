@@ -15,7 +15,7 @@ let reply = async (ctx, next) => {
         }
 
         ctx.body = reply;
-        
+
     } else if (message.MsgType === 'text') {
         let content = message.Content;
         let reply = 'Oh,你说的' + content + '太复杂了无法解析';
@@ -230,6 +230,66 @@ let reply = async (ctx, next) => {
             console.log(batchUsersInfo)
 
             reply = JSON.stringify(batchUsersInfo)
+        } else if (content === '15') {
+            // 二维码测试
+
+            // 临时二维码
+            // let tempQrData = {
+            //     expire_seconds: 400000,
+            //     action_name: 'QR_SCENE',
+            //     action_info: {
+            //         scene: {
+            //             scene_id: 101
+            //         }
+            //     }
+            // }
+            // let tempTicketData = await client.handle('createQrcode', tempQrData)
+            // console.log(tempTicketData)
+            // let tempQr = client.showQrcode(tempTicketData.ticket)
+
+            // reply = tempQr
+
+            // 永久二维码
+            let qrData = {
+                // 去掉过期时间就是永久二维码了
+                action_name: 'QR_SCENE',
+                action_info: {
+                    scene: {
+                        scene_id: 99
+                    }
+                }
+            }
+            let ticketData = await client.handle('createQrcode', qrData)
+            console.log(ticketData)
+            let qr = client.showQrcode(ticketData.ticket)
+            console.log(qr)
+
+            reply = qr
+
+        } else if (content === '16') {
+            let longurl = 'https://coding.imooc.com/class/178.html?a=1'
+            let shortData = await client.handle('createShortUrl', 'long2short', longurl)
+
+            console.log(shortData)
+
+            reply = shortData.short_url
+        } else if (content === '17') {
+            let semanticData = {
+                query: '查一下明天从杭州到北京的南航机票',
+                city: '杭州',
+                category: 'flight,hotel',
+                uid: message.FromUserName
+            }
+            let searchData = await client.handle('semantic', semanticData)
+
+            console.log(searchData)
+
+            reply = JSON.stringify(searchData)
+        } else if (content === '18'){
+            let body = '你好啊，我来自中国';
+            let aiData = await client.handle('aiTranslate',body,'zh_CN','en_US')
+
+            reply = JSON.stringify(aiData);
         }
 
         ctx.body = reply;

@@ -2,8 +2,11 @@ var fs = require('fs');
 const request = require('request-promise');
 
 const base = 'https://api.weixin.qq.com/cgi-bin/';
+const mpBase = 'https://mp.weixin.qq.com/cgi-bin/';
+const semanticUrl = 'https://api.weixin.qq.com/semantic/semproxy/search?';
 
 const api = {
+    semanticUrl,
     accessToken: base + 'token?grant_type=client_credential',
     temporary: {
         upload: base + 'media/upload?',
@@ -40,6 +43,25 @@ const api = {
         remark: base + 'user/info/updateremark?',
         info: base + 'user/info?',
         batch: base + 'user/info/batchget?'
+    },
+    qrcode: {
+        create: base + 'qrcode/create?',
+        show: mpBase + 'showqrcode?'
+    },
+    shortUrl: {
+        create: base + 'shorturl?'
+    },
+    ai: {
+        translate: base + 'media/voice/translatecontent?'
+    },
+    menu: {
+        create: base + 'menu/create?',
+        del: base + 'menu/delete?',
+        custom: base + 'menu/addconditional?',
+        fetch: base + 'menu/get?'
+    },
+    ticket: {
+        get: base + 'ticket/getticket?'
     }
 }
 
@@ -385,10 +407,51 @@ module.exports = class Wechat {
         }
 
         const url = api.user.batch + 'access_token=' + token;
-        
+
         return { method: 'POST', url, body }
     }
 
+    // 创建二维码 Ticket
+    createQrcode(token, qr) {
+        const url = api.qrcode.create + 'access_token=' + token
+        const body = qr
 
+        return { method: 'POST', url, body }
+    }
+
+    // 通过 Ticket 换取二维码
+    showQrcode(ticket) {
+        const url = api.qrcode.show + 'ticket=' + encodeURI(ticket)
+
+        return url
+    }
+
+    // 长链接转短链接
+    createShortUrl(token, action = 'long2short', longurl) {
+        const url = api.shortUrl.create + 'access_token=' + token
+        const body = {
+            action,
+            long_url: longurl
+        }
+
+        return { method: 'POST', url, body }
+    }
+
+    // 语义理解-查询特定的语句进行分析
+    semantic(token, semanticData) {
+        const url = api.semanticUrl + 'access_token=' + token
+        semanticData.appid = this.appID
+
+        return { method: 'POST', url, body: semanticData }
+    }
+
+    // AI 接口
+    aiTranslate(token, body, lfrom, lto) {
+        const url = api.ai.translate + 'access_token=' + token + '&lfrom=' + lfrom + '&lto=' + lto
+
+        return { method: 'POST', url, body }
+    }
+
+    
 
 }
