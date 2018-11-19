@@ -35,6 +35,12 @@ const api = {
         batchUnTag: base + 'tags/members/batchuntagging?',
         getUserTags: base + 'tags/getidlist?'
     },
+    user: {
+        fetch: base + 'user/get?',
+        remark: base + 'user/info/updateremark?',
+        info: base + 'user/info?',
+        batch: base + 'user/info/batchget?'
+    }
 }
 
 module.exports = class Wechat {
@@ -345,5 +351,44 @@ module.exports = class Wechat {
 
         return { method: 'POST', url, body }
     }
+
+    // 给用户设置别名 服务号专用接口
+    remarkUser(token, openId, remark) {
+        const body = {
+            openid: openId,
+            remark
+        }
+
+        const url = api.user.remark + 'access_token=' + token
+
+        return { method: 'POST', url, body }
+    }
+
+    // 获取粉丝列表
+    fetchUserList(token, openId) {
+        const url = api.user.fetch + 'access_token=' + token + '&next_openid=' + (openId || '')
+
+        return { url }
+    }
+
+    // 获取用户的详细信息
+    getUserInfo(token, openId, lan = 'zh_CN') {
+        const url = api.user.info + 'access_token=' + token + '&openid=' + openId + '&lang=' + lan
+
+        return { url }
+    }
+
+    // 批量获取用户详细信息
+    fetchBatchUsers(token, openIdList) {
+        const body = {
+            user_list: openIdList
+        }
+
+        const url = api.user.batch + 'access_token=' + token;
+        
+        return { method: 'POST', url, body }
+    }
+
+
 
 }

@@ -5,9 +5,18 @@ let reply = async (ctx, next) => {
 
     let mp = require('./index');
     let client = mp.getWechat();
+    if (message.MsgType === 'event') {
 
+        let reply = '';
 
-    if (message.MsgType === 'text') {
+        if (message.Event === 'LOCATION') {
+            // 地理位置上报
+            reply = `您上报的位置是：${message.Latitude}-${message.Longitude}-${message.Precision}`
+        }
+
+        ctx.body = reply;
+        
+    } else if (message.MsgType === 'text') {
         let content = message.Content;
         let reply = 'Oh,你说的' + content + '太复杂了无法解析';
 
@@ -193,6 +202,34 @@ let reply = async (ctx, next) => {
             // let userTags = await client.handle('getUserTags', message.FromUserName)
 
             reply = tagsData.tags.length
+        } else if (content === '11') {
+            // 获取用户列表
+
+            let userList = await client.handle('fetchUserList')
+            console.log(userList)
+            reply = userList.total + ' 个关注者'
+
+        } else if (content === '12') {
+            // 给用户加备注，服务号可用
+            await client.handle('remarkUser', message.FromUserName, 'ScottScott');
+            reply = '改名成功'
+        } else if (content === '13') {
+            // 获取单个用户信息
+            let userInfoData = await client.handle('getUserInfo', message.FromUserName)
+
+            console.log(userInfoData)
+
+            reply = JSON.stringify(userInfoData)
+        } else if (content === '14') {
+            // 批量获取用户信息
+            let batchUsersInfo = await client.handle('fetchBatchUsers', [{
+                openid: message.FromUserName,
+                lang: 'zh_CN'
+            }])
+
+            console.log(batchUsersInfo)
+
+            reply = JSON.stringify(batchUsersInfo)
         }
 
         ctx.body = reply;
