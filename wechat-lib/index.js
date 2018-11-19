@@ -452,6 +452,30 @@ module.exports = class Wechat {
         return { method: 'POST', url, body }
     }
 
-    
+    // 创建菜单和自定义菜单
+    createMenu(token, menu, rules) {
+        let url = api.menu.create + 'access_token=' + token
+
+        if (rules) {
+            url = api.menu.custom + 'access_token=' + token
+            menu.matchrule = rules
+        }
+
+        return { method: 'POST', url, body: menu }
+    }
+
+    // 删除菜单
+    deleteMenu(token) {
+        const url = api.menu.del + 'access_token=' + token
+
+        return { url }
+    }
+
+    // 获取菜单
+    fetchMenu(token) {
+        const url = api.menu.fetch + 'access_token=' + token
+
+        return { url }
+    }
 
 }
