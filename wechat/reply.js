@@ -285,11 +285,62 @@ let reply = async (ctx, next) => {
             console.log(searchData)
 
             reply = JSON.stringify(searchData)
-        } else if (content === '18'){
+        } else if (content === '18') {
             let body = '你好啊，我来自中国';
-            let aiData = await client.handle('aiTranslate',body,'zh_CN','en_US')
+            let aiData = await client.handle('aiTranslate', body, 'zh_CN', 'en_US')
 
             reply = JSON.stringify(aiData);
+        } else if (content === '19') {
+            try {
+                let delData = await client.handle('deleteMenu')
+                console.log(delData)
+                let menu = {
+                    button: [
+                        {
+                            name: '一级菜单',
+                            sub_button: [
+                                {
+                                    name: '二级菜单 1',
+                                    type: 'click',
+                                    key: 'no_1'
+                                }, {
+                                    name: '二级菜单 2',
+                                    type: 'click',
+                                    key: 'no_2'
+                                }, {
+                                    name: '二级菜单 3',
+                                    type: 'click',
+                                    key: 'no_3'
+                                }, {
+                                    name: '二级菜单 4',
+                                    type: 'click',
+                                    key: 'no_4'
+                                }, {
+                                    name: '二级菜单 5',
+                                    type: 'click',
+                                    key: 'no_5'
+                                }
+                            ]
+                        },
+                        {
+                            name: '分类',
+                            type: 'view',
+                            url: 'https://www.imooc.com'
+                        },
+                        {
+                            name: '新菜单_' + Math.random(),
+                            type: 'click',
+                            key: 'new_111'
+                        }
+                    ]
+                }
+                let createData = await client.handle('createMenu', menu)
+                console.log(createData)
+            } catch (e) {
+                console.log(e)
+            }
+            
+            reply = '菜单创建成功，请等 5 分钟，或者先取消关注，再重新关注就可以看到新菜单'
         }
 
         ctx.body = reply;
