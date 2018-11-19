@@ -54,8 +54,8 @@ exports.formatMessage = (result) => {
 
 exports.tpl = (content,message) => {
 
-    console.log('content');
-    console.log(content);
+    // console.log('content');
+    // console.log(content);
     
     let type = 'text';
 
@@ -79,8 +79,8 @@ exports.tpl = (content,message) => {
         fromUserName: message.ToUserName
     })
 
-    console.log('info');
-    console.log(info);
+    // console.log('info');
+    // console.log(info);
     
     return template(info);
 }

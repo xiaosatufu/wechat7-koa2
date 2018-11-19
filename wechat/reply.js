@@ -20,7 +20,7 @@ let reply = async (ctx, next) => {
         } else if (content === '4') {
             let data = await client.handle('uploadMaterial', 'image', resolve(__dirname, '../img.jpg'));
             // 临时素材 图片上传
-            
+
             reply = {
                 type: 'image',
                 mediaId: data.media_id
@@ -72,12 +72,12 @@ let reply = async (ctx, next) => {
                 console.log('报错了');
                 console.log(data);
             }
-            
+
             // let data2 = await client.handle('uploadMaterial','pic',resolve(__dirname, '../img.jpg'),{type: 'image'});
 
             // console.log('data');
             // console.log(data);
-            
+
             let media = {
                 articles: [
                     {
@@ -102,8 +102,8 @@ let reply = async (ctx, next) => {
             }
 
             let uploadData = await client.handle('uploadMaterial', 'news', media, {});
-            let newsData = await client.handle('fetchMaterial',uploadData.media_id,'news',true);
-            
+            let newsData = await client.handle('fetchMaterial', uploadData.media_id, 'news', true);
+
             let items = newsData.news_item;
             let news = [];
 
@@ -121,32 +121,32 @@ let reply = async (ctx, next) => {
 
             // console.log('newsData');
             // console.log(news);
-            
+
             // reply = '上传成功'
             reply = news;
-        } else if (content === '9'){
+        } else if (content === '9') {
             // 查询媒体数量
             let counts = await client.handle('countMaterial');
 
             // console.log(JSON.stringify(counts));
 
             let res = await Promise.all([
-                client.handle('batchMaterial',{
+                client.handle('batchMaterial', {
                     type: 'image',
                     offset: 0,
                     count: 10
                 }),
-                client.handle('batchMaterial',{
+                client.handle('batchMaterial', {
                     type: 'video',
                     offset: 0,
                     count: 10
                 }),
-                client.handle('batchMaterial',{
+                client.handle('batchMaterial', {
                     type: 'voice',
                     offset: 0,
                     count: 10
                 }),
-                client.handle('batchMaterial',{
+                client.handle('batchMaterial', {
                     type: 'news',
                     offset: 0,
                     count: 10
@@ -162,6 +162,37 @@ let reply = async (ctx, next) => {
                 voice: ${res[2].total_count}
                 news: ${res[3].total_count}
             `
+        } else if (content === '10') {
+            // 创建标签
+            // let newTag = await client.handle('createTag', 'imooc')
+            // console.log(newTag)
+
+            // 删除标签
+            // await client.handle('delTag', 100)
+
+            // 编辑标签
+            // await client.handle('updateTag', 101, '慕课网')
+
+            // 批量打标签/取消标签
+            // 打标签
+            // await client.handle('batchTag', [message.FromUserName], 100)
+            // 取消标签
+            // await client.handle('batchTag', [message.FromUserName], 100, true)
+
+            // 获取某个标签的用户列表
+            // let userList = await client.handle('fetchTagUsers', 2)
+            // console.log(userList)
+
+            // 获取公众号的标签列表
+            let tagsData = await client.handle('fetchTags')
+            console.log('tagsData');
+            console.log(tagsData);
+
+
+            // 获取某个用户的标签列表
+            // let userTags = await client.handle('getUserTags', message.FromUserName)
+
+            reply = tagsData.tags.length
         }
 
         ctx.body = reply;
