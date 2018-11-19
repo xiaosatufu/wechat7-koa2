@@ -68,39 +68,67 @@ let reply = async (ctx, next) => {
                 type: 'image'
             });
 
+            if (data.errcode) {
+                console.log('报错了');
+                console.log(data);
+            }
+            
+            // let data2 = await client.handle('uploadMaterial','pic',resolve(__dirname, '../img.jpg'),{type: 'image'});
+
+            // console.log('data');
+            // console.log(data);
+            
             let media = {
                 articles: [
                     {
                         title: '这是服务端上传的图文 1',
                         thumb_media_id: data.media_id,
                         author: '咸蛋超人',
-                        digest: '没有摘要',
+                        digest: '一号的摘要',
                         show_cover_pic: 1,
-                        content: '去往百度的车',
+                        content: '一号的内容',
                         content_source_url: 'https://www.baidu.com/'
                     },
                     {
                         title: '这是服务端上传的图文 2',
                         thumb_media_id: data.media_id,
                         author: '咸蛋超人',
-                        digest: '没有摘要',
+                        digest: '二号的摘要',
                         show_cover_pic: 1,
-                        content: '同样去百度的车',
+                        content: '二号的内容',
                         content_source_url: 'https://www.baidu.com/'
                     },
                 ]
             }
 
             let uploadData = await client.handle('uploadMaterial', 'news', media, {});
-
-            console.log(uploadData);
+            let newsData = await client.handle('fetchMaterial',uploadData.media_id,'news',true);
             
-            reply = '上传成功'
+            let items = newsData.news_item;
+            let news = [];
+
+            // console.log('newsData');
+            // console.log(newsData);
+
+            items.forEach(item => {
+                news.push({
+                    title: item.title,
+                    description: item.description,
+                    picUrl: data.url,
+                    url: item.url
+                })
+            });
+
+            // console.log('newsData');
+            // console.log(news);
+            
+            // reply = '上传成功'
+            reply = news;
         } else if (content === '9'){
             // 查询媒体数量
             let counts = await client.handle('countMaterial');
 
-            console.log(JSON.stringify(counts));
+            // console.log(JSON.stringify(counts));
 
             let res = await Promise.all([
                 client.handle('batchMaterial',{
@@ -125,7 +153,8 @@ let reply = async (ctx, next) => {
                 }),
             ]);
 
-            console.log(res);
+            // console.log(res);
+
 
             reply = `
                 image: ${res[0].total_count}

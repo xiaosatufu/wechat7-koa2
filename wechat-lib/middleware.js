@@ -46,6 +46,9 @@ module.exports = (config, reply) => {
             const replyBody = ctx.body;
             const msg = ctx.weixin;
             const xml = util.tpl(replyBody,msg);
+
+            console.log('xml');
+            console.log(xml);
             
             ctx.status = 200;
             ctx.type = 'application/xml';

@@ -6,7 +6,9 @@ const base = 'https://api.weixin.qq.com/cgi-bin/';
 const api = {
     accessToken: base + 'token?grant_type=client_credential',
     temporary: {
-        upload: base + 'media/upload?'
+        upload: base + 'media/upload?',
+        // 获取临时素材
+        fetch: base + 'media/get?'
     },
     permanent: {
         upload: base + 'material/add_material?',
@@ -31,8 +33,7 @@ module.exports = class Wechat {
         this.appID = opts.appID;
         this.appSecret = opts.appSecret;
         this.getAccessToken = opts.getAccessToken;
-        this.saveAccessToken = opts.saveAccessToken;
-
+        this.saveAccessToken = opts.saveAccessToken; 
 
         this.fetchAccessToken();
     }
@@ -173,17 +174,31 @@ module.exports = class Wechat {
 
     fetchMaterial(token, mediaId, type, permanent) {
         let form = {};
-        let fetchUrl = api.permanent.fetch;
+        let fetchUrl = api.temporary.fetch;
+
+        if (permanent) {
+            fetchUrl = api.permanent.fetch;
+        }
+        
         let url = fetchUrl + 'access_token=' + token
         let options = {
             method: 'POST',
             url
         }
 
-        form.media_id = mediaId;
-        form.access_token = token;
-        options.body = form;
+        if (permanent) {
+            form.media_id = mediaId;
+            form.access_token = token;
+            options.body = form;
+        } else {
+            if (type === 'video') {
+                // 获取临时素材时需要将https转换成http
+                url = url.replace('https:','http:');
+            }
 
+            url += '$media_id' + mediaId;
+        }
+        
         return options
     }
 
