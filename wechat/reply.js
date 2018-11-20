@@ -339,6 +339,7 @@ let reply = async (ctx, next) => {
             } catch (e) {
                 console.log(e)
             }
+<<<<<<< HEAD
 
             reply = '菜单创建成功，请等 5 分钟，或者先取消关注，再重新关注就可以看到新菜单'
         } else if (content === '20') {
@@ -410,6 +411,9 @@ let reply = async (ctx, next) => {
             let menus = await client.handle('fetchMenu')
             console.log(JSON.stringify(menus))
 
+=======
+            
+>>>>>>> 748cdb4407fbcf94d7a996d2134fcab246e3d33e
             reply = '菜单创建成功，请等 5 分钟，或者先取消关注，再重新关注就可以看到新菜单'
         }
 
