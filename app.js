@@ -1,4 +1,6 @@
 const Koa = require('koa');
+const moment = require('moment');
+const path = require('path');
 
 const wechat = require('./wechat-lib/middleware');
 const config = require('./config/config');
@@ -21,6 +23,15 @@ const { initSchemas, connect } = require('./app/database/init');
     // 生成服务器实例
     const app = new Koa();
     const router = new Router();
+
+    const views = require('koa-views');
+
+    app.use(views(path.resolve(__dirname + '/app/views'),{
+        extension: 'pug',
+        options:{
+            moment: moment
+        }
+    }))
 
     //接入微信消息中间件
     // ctx是koa的应用上下文
