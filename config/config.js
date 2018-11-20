@@ -7,5 +7,6 @@ module.exports = {
         appID: 'wx221b0bbd2301340e',
         appSecret: '656fbe49f6c3c0726ab6d7e68d284685',
         token: 'imoocisareallyamzingplacetolearn'
-    }
+    },
+    baseUrl: 'http://22363519pf.imwork.net:36148/'
 }

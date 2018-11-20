@@ -3,6 +3,7 @@ const Koa = require('koa');
 const wechat = require('./wechat-lib/middleware');
 const config = require('./config/config');
 const { reply } = require('./wechat/reply');
+const Router = require('koa-router');
 
 const { initSchemas, connect } = require('./app/database/init');
 
@@ -19,11 +20,16 @@ const { initSchemas, connect } = require('./app/database/init');
     
     // 生成服务器实例
     const app = new Koa();
+    const router = new Router();
 
-    //加载认证中间件
+    //接入微信消息中间件
     // ctx是koa的应用上下文
     // next就是串联中间件的钩子函数
-    app.use(wechat(config, reply));
+    require('./config/routes')(router);
+    // app.use(wechat(config, reply));
+
+    // 让路由中间件生效
+    app.use(router.routes()).use(router.allowedMethods());
 
     app.listen(config.port);
     console.log('Listen' + config.port);
