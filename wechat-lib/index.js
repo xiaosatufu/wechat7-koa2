@@ -72,6 +72,8 @@ module.exports = class Wechat {
         this.appSecret = opts.appSecret;
         this.getAccessToken = opts.getAccessToken;
         this.saveAccessToken = opts.saveAccessToken;
+        this.getTicket = opts.getTicket
+        this.saveTicket = opts.saveTicket
 
         this.fetchAccessToken();
     }
@@ -99,7 +101,7 @@ module.exports = class Wechat {
         //     data = await this.getAccessToken();
         // }
 
-        if (!this.isValidToken(data)) {
+        if (!this.isValid(data, 'access_token')) {
             data = await this.updateAccessToken();
         }
 
@@ -121,12 +123,36 @@ module.exports = class Wechat {
         // console.log('获取token');
         // console.log(data);
 
+        return data
+    }
+
+
+    async fetchTicket(token) {
+        let data = await this.getTicket()
+
+        if (!this.isValid(data, 'ticket')) {
+            data = await this.updateTicket(token)
+        }
+
+        await this.saveTicket(data)
+        return data
+    }
+
+    // 获取 token
+    async updateTicket(token) {
+        const url = `${api.ticket.get}access_token=${token}&type=jsapi`
+
+        const data = await this.request({ url })
+        const now = new Date().getTime()
+        const expiresIn = now + (data.expires_in - 20) * 1000
+
+        data.expires_in = expiresIn
 
         return data
     }
 
-    isValidToken(data) {
-        if (!data || !data.expires_in) {
+    isValid(data,name) {
+        if (!data || !data[name].expires_in) {
             return false
         }
 
